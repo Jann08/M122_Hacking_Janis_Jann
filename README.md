@@ -6,6 +6,41 @@
 
 Dieses Projekt simuliert einen automatisierten Angreifer, der eine absichtlich verwundbare Ziel-VM Aufgesetzt in einem Docker Container angreift. Die Simulation nutzt klassische Pentesting-Tools (nmap, hydra) und durchläuft ein Script das ein portscan macht und mit hydra eine Brootforce Attacke startet. Bei Erfolg oder Misserfolg wir das in 3 unterschiedlichen Log dateien die resultate aufgezeichnet. Diese 3 dateien werden von einem Bash Script in einer Summary Datei zusammengefasst.
 
+
+### 🔧 Selbst benutzen
+
+1. **Repository klonen:**
+
+```bash
+git clone https://github.com/ric3-12/M122_Hacking_Janis_Jann.git
+```
+
+2. **Lab entpacken:**
+
+Entpacke `redteam-lab.7z` an einen passenden Ort.
+
+3. **Lab starten:**
+
+Öffne den `redteam-lab` Ordner im Docker-Terminal und baue die Container mit:
+
+```bash
+docker compose build
+```
+
+Warte, bis alle Images erfolgreich gebaut wurden.
+
+4. **Logs vorbereiten:**
+
+Lösche im `logs/`-Ordner alle vorhandenen Logdateien.
+
+5. **Simulation starten:**
+
+```bash
+docker compose up -d
+```
+
+In Kürze erscheinen im `logs/`-Ordner neue Log-Dateien sowie eine fertige `summary.txt` mit allen Ergebnissen.
+
 ### Ablauf der Simulation:
 - Recon → Scan der Ziel-VM
 - Start des Scripts
@@ -88,4 +123,28 @@ Dieses Projekt simuliert einen automatisierten Angreifer, der eine absichtlich v
 
 ![Screenshot](/Media/Analyse.png)
 
-- Script Testing
+### ✅ Testfälle – M122 Hacking Projekt
+
+| Testfall | Thema                          | Ressourcen                  | Resultat               |
+|----------|--------------------------------|------------------------------|-------------------------|
+| T1       | DVWA Setup funktioniert        | `dvwa_setup.sh`, `target`    | „DVWA database setup completed“ ✅ |
+| T2       | Target online vor Angriff      | `curl target:80/setup.php`   | HTTP 200 OK ✅          |
+| T3       | Angriffsscript startet sauber  | `attack.sh`                  | „Starte Angriff auf Ziel“ ✅ |
+| T4       | nmap installiert               | `attack.sh`                  | Tool vorhanden ✅        |
+| T5       | hydra installiert              | `attack.sh`                  | Tool vorhanden ✅        |
+| T6       | Wordlist existiert             | `rockyou.txt`                | Datei gefunden ✅        |
+| T7       | Nmap Log erzeugt               | `nmap.txt`                   | Datei vorhanden ✅       |
+| T8       | Hydra Log erzeugt              | `hydra.txt`                  | Datei vorhanden ✅       |
+| T9       | Nmap Scan erfolgreich          | `nmap` Scan gegen SSH/HTTP   | 3 Ports sichtbar ✅      |
+| T10      | Hydra Erfolg erkannt           | `analyze.sh`                 | Benutzer + PW geloggt ✅ |
+| T11      | analyze.sh startet automatisch | `attack.sh` → `/analyze.sh` | Summary wurde erstellt ✅ |
+| T12      | Zusammenfassung vollständig    | `summary.txt`                | Alle Blöcke enthalten ✅ |
+| T13      | Fehlerhafte Tools              | `attack.sh` verändert        | Tool nicht gefunden ❌   |
+| T14      | Log-Verzeichnis beschreibbar   | `/logs/`                     | chmod 777 funktioniert ✅ |
+| T15      | Endzeit korrekt im Log         | `attack.sh`                  | „Angriff abgeschlossen“ ✅ |
+| T16      | Kein Passwort gefunden         | `hydra.txt` leer             | „Kein erfolgreicher Login“ ✅ |
+| T17      | Ungültige Wordlist             | falscher Pfad in `attack.sh` | Fehler geloggt ✅        |
+| T18      | Apache SSL aktiv               | `apache-ssl.conf`            | Port 443 aktiv ✅        |
+| T19      | DVWA erreichbar                | `curl` auf Setup             | Status 200 ✅            |
+| T20      | Setup-Loop funktioniert        | `dvwa_setup.sh`              | Wartet auf HTTP 200 ✅   |
+
